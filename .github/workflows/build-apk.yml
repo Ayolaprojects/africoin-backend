@@ -10,15 +10,9 @@ on:
 permissions:
   contents: write
 
-env:
-  APP_DIR: AFRICOIN/AFRICOIN-APP - IOS
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ env.APP_DIR }}
     
     steps:
     - uses: actions/checkout@v4
@@ -56,7 +50,7 @@ jobs:
       if: success()
       with:
         name: android-debug-apk
-        path: AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/debug/app-debug.apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
         if-no-files-found: error
         retention-days: 30
     
@@ -65,7 +59,7 @@ jobs:
       if: success()
       with:
         name: android-release-apk
-        path: AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        path: android/app/build/outputs/apk/release/app-release-unsigned.apk
         if-no-files-found: error
         retention-days: 30
 
@@ -74,7 +68,7 @@ jobs:
       if: success()
       with:
         name: android-release-aab
-        path: AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/bundle/release/app-release.aab
+        path: android/app/build/outputs/bundle/release/app-release.aab
         if-no-files-found: error
         retention-days: 30
     
@@ -83,8 +77,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/debug/app-debug.apk
-          AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/release/app-release-unsigned.apk
-          AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/bundle/release/app-release.aab
+          android/app/build/outputs/apk/debug/app-debug.apk
+          android/app/build/outputs/apk/release/app-release-unsigned.apk
+          android/app/build/outputs/bundle/release/app-release.aab
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
