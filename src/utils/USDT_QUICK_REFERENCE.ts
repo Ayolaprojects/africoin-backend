@@ -1,38 +1,43 @@
 /**
  * AFRICOIN Real USDT Transactions - Quick Reference
  * Copy & paste examples for common operations
+ * NOTE: This is a reference file. Code snippets are for documentation only.
  */
 
 // ============ QUICK START ============
 
 /**
  * 1. CHECK IF REAL TRANSACTIONS ARE ENABLED
+ * 
+ * Usage:
+ * import { isRealTransactionMode, TRANSACTION_MODES } from './config/usdtConfig';
+ * if (isRealTransactionMode()) {
+ *   console.log('✅ Real USDT transactions are ENABLED');
+ * } else {
+ *   console.log('❌ Real USDT transactions are DISABLED');
+ * }
  */
-import { isRealTransactionMode, TRANSACTION_MODES } from './config/usdtConfig';
-
-if (isRealTransactionMode()) {
-  console.log('✅ Real USDT transactions are ENABLED');
-} else {
-  console.log('❌ Real USDT transactions are DISABLED');
-}
 
 // ============ BALANCE OPERATIONS ============
 
 /**
  * 2. CHECK USDT BALANCE ON SOLANA
+ * 
+ * Usage:
+ * import { getUSDTBalance } from './services/usdtTransactionService';
+ * import { PublicKey } from '@solana/web3.js';
+ * 
+ * const userWallet = new PublicKey('DKEdEJyK2gZCVmJhKHkzqV6hMfqaRvgLdBKVDuZpM6XP');
+ * const balance = await getUSDTBalance('solana', userWallet.toString());
+ * console.log(`USDT Balance: ${balance} USDT`);
  */
-import { getUSDTBalance } from './services/usdtTransactionService';
-import { PublicKey } from '@solana/web3.js';
-
-const userWallet = new PublicKey('DKEdEJyK2gZCVmJhKHkzqV6hMfqaRvgLdBKVDuZpM6XP');
-const balance = await getUSDTBalance('solana', userWallet.toString());
-console.log(`USDT Balance: ${balance} USDT`);
 
 /**
  * 3. CHECK USDT BALANCE ON TRON
- */
-const tronAddress = 'TQmV2L6yNd1yEDkpvzMjhbx5Eg4yYGaBXL';
-const tronBalance = await getUSDTBalance('tron', tronAddress);
+ * 
+ * Usage:
+ * const tronAddress = 'TQmV2L6yNd1yEDkpvzMjhbx5Eg4yYGaBXL';
+ * const tronBalance = await getUSDTBalance('tron', tronAddress);
 console.log(`TRON USDT Balance: ${tronBalance} USDT`);
 
 // ============ PRICE OPERATIONS ============

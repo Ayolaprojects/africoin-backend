@@ -7,7 +7,7 @@ import '../styles/Navigation.css';
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const { connected, publicKey } = useWallet();
+  const {} = useWallet();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 

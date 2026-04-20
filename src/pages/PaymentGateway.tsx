@@ -6,7 +6,7 @@ import '../styles/PaymentGateway.css';
 
 const PaymentGateway: React.FC = () => {
   const [step, setStep] = useState<'payment' | 'kyc' | 'bank' | 'zimbabwe'>('payment');
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'payfast' | 'luno' | 'ecocash' | 'payzone' | 'kwese'>('stripe');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'payfast' | 'luno' | 'ecocash' | 'ecocash_airtime' | 'payzone' | 'kwese'>('stripe');
   const [country, setCountry] = useState('ZA');
   const [amount, setAmount] = useState(100);
   const [currency, setCurrency] = useState<'USDT' | 'ZAR' | 'USD' | 'ZWL'>('USDT');
@@ -124,9 +124,6 @@ const PaymentGateway: React.FC = () => {
     return paymentService.getAvailablePaymentMethods(country);
   };
 
-  const availableMethods = getAvailablePaymentMethods();
-  const banks = country === 'ZW' ? zimbabweService.getZimbabweanBanks() : paymentService.getSouthAfricanBanks();
-
   return (
     <div className="payment-gateway">
       <div className="payment-container">
@@ -205,7 +202,7 @@ const PaymentGateway: React.FC = () => {
                     </button>
                     <button
                       className={`method-btn zimbabwe ${paymentMethod === 'ecocash_airtime' ? 'selected' : ''}`}
-                      onClick={() => setPaymentMethod('ecocash_airtime')}
+                      onClick={() => setPaymentMethod('ecocash_airtime' as any)}
                     >
                       📱 EcoCash Airtime
                     </button>
@@ -254,7 +251,7 @@ const PaymentGateway: React.FC = () => {
             </div>
 
             {/* Zimbabwe Payment Methods */}
-            {country === 'ZW' && (paymentMethod === 'ecocash' || paymentMethod === 'ecocash_airtime') && (
+            {country === 'ZW' && (paymentMethod === 'ecocash' || paymentMethod === ('ecocash_airtime' as any)) && (
               <div className="zimbabwe-form">
                 <h3>💚 EcoCash Payment</h3>
                 <div className="form-group">

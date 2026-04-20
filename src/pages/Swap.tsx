@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Button from '../components/Button';
-import { unifiedUSDT, solanaUSDT, tronUSDT } from '../services/usdtService';
+import { unifiedUSDT, solanaUSDT } from '../services/usdtService';
 import { USDTValidator } from '../utils/usdtValidator';
 import { useUSDTTransaction } from '../hooks/useUSDTTransaction';
 import { solanaService } from '../services/solanaService';
@@ -17,7 +17,7 @@ interface SwapData {
 
 const Swap: React.FC = () => {
   const { publicKey } = useWallet();
-  const { sendUSDT, getPrice, isLoading: transactionLoading } = useUSDTTransaction();
+  const { isLoading: transactionLoading } = useUSDTTransaction();
   const [swapFrom, setSwapFrom] = useState('USDT');
   const [swapTo, setSwapTo] = useState('SOL');
   const [amount, setAmount] = useState('100');
