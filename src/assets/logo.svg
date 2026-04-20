@@ -1,0 +1,43 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="#020817" stroke="#22c55e" stroke-width="4"/>
+  
+  <!-- Outer Ring -->
+  <circle cx="256" cy="256" r="220" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#22c55e" stroke-width="2"/>
+  
+  <!-- Gold African Coin Pattern -->
+  <g id="coin-pattern">
+    <!-- Main Letter A -->
+    <g transform="translate(256, 256)">
+      <!-- Left side of A -->
+      <path d="M -60 120 L -20 -80 L 0 -100 L 20 -80 L 60 120" 
+            fill="none" stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Horizontal bar of A -->
+      <line x1="-40" y1="0" x2="40" y2="0" stroke="#fbbf24" stroke-width="10" stroke-linecap="round"/>
+      
+      <!-- Gold accent dots -->
+      <circle cx="-80" cy="-40" r="6" fill="#fbbf24"/>
+      <circle cx="80" cy="-40" r="6" fill="#fbbf24"/>
+      <circle cx="0" cy="-120" r="8" fill="#22c55e"/>
+    </g>
+  </g>
+  
+  <!-- Text "AFRICOIN" -->
+  <text x="256" y="400" 
+        font-family="Arial, sans-serif" 
+        font-size="32" 
+        font-weight="bold" 
+        fill="#22c55e" 
+        text-anchor="middle" 
+        letter-spacing="2">AFRICOIN</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="80" cy="80" r="4" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="432" cy="80" r="4" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="80" cy="432" r="4" fill="#fbbf24" opacity="0.5"/>
+  <circle cx="432" cy="432" r="4" fill="#fbbf24" opacity="0.5"/>
+</svg>

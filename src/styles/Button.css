@@ -1,0 +1,65 @@
+.btn {
+  padding: 0.9rem 1.7rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--green), var(--green-strong));
+  color: #020617;
+  box-shadow: 0 0 18px rgba(22, 163, 74, 0.35);
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 0 10px rgba(22, 163, 74, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--gold);
+  color: #020617;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.35);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  border: 1px solid rgba(148, 163, 184, 0.65);
+  background: radial-gradient(circle at top left, rgba(21, 128, 61, 0.24), rgba(15, 23, 42, 0.96));
+  color: var(--text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--green);
+}
+
+.btn-small {
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+}
+
+.btn-large {
+  padding: 1.2rem 2rem;
+  font-size: 1rem;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+}

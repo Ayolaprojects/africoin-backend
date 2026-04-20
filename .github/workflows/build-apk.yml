@@ -1,0 +1,90 @@
+name: Build Android Artifacts
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  APP_DIR: AFRICOIN/AFRICOIN-APP - IOS
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.APP_DIR }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'gradle'
+    
+    - name: Install dependencies
+      run: npm ci --legacy-peer-deps
+    
+    - name: Build web app
+      run: npm run build
+    
+    - name: Sync to Android
+      run: npx cap sync android
+    
+    - name: Build Android artifacts
+      run: |
+        cd android
+        chmod +x gradlew
+        ./gradlew assembleDebug assembleRelease bundleRelease
+    
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: android-debug-apk
+        path: AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
+        retention-days: 30
+    
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: android-release-apk
+        path: AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        if-no-files-found: error
+        retention-days: 30
+
+    - name: Upload Release AAB
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: android-release-aab
+        path: AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/bundle/release/app-release.aab
+        if-no-files-found: error
+        retention-days: 30
+    
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/debug/app-debug.apk
+          AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/apk/release/app-release-unsigned.apk
+          AFRICOIN/AFRICOIN-APP - IOS/android/app/build/outputs/bundle/release/app-release.aab
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
