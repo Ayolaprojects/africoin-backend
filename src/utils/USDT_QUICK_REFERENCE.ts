@@ -300,20 +300,6 @@ export function SwapComponent() {
       setLoading(false);
     }
   };
-
-  return (
-    <div>
-      <input
-        type="number"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        placeholder="Amount in USDT"
-      />
-      <button onClick={handleSwap} disabled={loading}>
-        {loading ? 'Processing...' : 'Swap'}
-      </button>
-    </div>
-  );
 }
 
 // ============ COMMON ERRORS & SOLUTIONS ============

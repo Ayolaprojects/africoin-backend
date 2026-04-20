@@ -14,7 +14,7 @@ export const USDT_CONFIG = {
   },
   tron: {
     mainnet: 'TR7NHqjeKQxGTCi8q282JOKUYJUARIPEY6',
-    shasta: '41': 'TG3XXyExBkPp9nzdajQjthH6ykqS3koN21',
+    shasta: 'TG3XXyExBkPp9nzdajQjthH6ykqS3koN21',
     decimals: 6,
     apiUrl: 'https://api.tronstack.io',
     shastaUrl: 'https://api.shasta.trongrid.io',
