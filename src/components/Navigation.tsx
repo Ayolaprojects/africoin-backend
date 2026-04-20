@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '../styles/Navigation.css';
 
 const Navigation: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { connected, publicKey } = useWallet();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -16,6 +18,7 @@ const Navigation: React.FC = () => {
     { label: 'Swap', path: '/swap' },
     { label: 'Payments', path: '/payments' },
     { label: 'Transactions', path: '/transactions' },
+    { label: '🇿🇼 Zimbabwe', path: '/zimbabwe' },
   ];
 
   return (
@@ -54,7 +57,10 @@ const Navigation: React.FC = () => {
         </nav>
 
         <div className="nav-cta">
-          <WalletMultiButton />
+          {/* Custom wallet button - cleaner design */}
+          <div className="wallet-connect">
+            <WalletMultiButton />
+          </div>
         </div>
       </div>
     </header>

@@ -1,53 +1,566 @@
-# 🎯 AfriCoin - Complete Integration & Deployment Guide
+# Real USDT Transaction System - Integration Guide
 
-## Project Structure Overview
+## 🚀 Quick Start
+
+This guide shows you how to integrate real USDT transactions into your Africoin app.
+
+### What's Included
+
+✅ **Real Blockchain Transactions**
+- Solana SPL token transfers (mainnet & devnet)
+- TRON TRC-20 transfers (mainnet & shasta testnet)
+- Real balance queries from blockchain
+
+✅ **Complete Validation System**
+- Address format validation (Solana Base58, TRON T-prefix)
+- Amount range validation ($1 - $1M per transaction)
+- Sufficient balance checking
+- XSS prevention and input sanitization
+
+✅ **React Integration**
+- Custom hook: `useUSDTTransaction()`
+- Automatic transaction monitoring
+- Loading and error states
+- Real-time balance updates
+
+✅ **Documentation & Testing**
+- Comprehensive test guide (USDT_TESTING_GUIDE.md)
+- Step-by-step testnet instructions
+- Mainnet migration checklist
+
+---
+
+## 📁 File Structure
 
 ```
-C:\Users\zwexm\LPSN\
-├── AFRICOIN/
-│   └── index.html                    # Original website landing page
-│
-└── AFRICOIN-APP - IOS/
-    ├── backend/                      # Express API (TypeScript)
-    ├── src/                          # React frontend (TypeScript)
-    ├── ios/                          # iOS native (Xcode)
-    ├── android/                      # Android native (Android Studio)
-    ├── capacitor.config.ts           # Mobile config
-    └── dist/                         # Built web app
+AFRICOIN-APP - IOS/
+├── src/
+│   ├── components/
+│   │   └── Navigation.tsx          ✅ UPDATED - Styled wallet button
+│   ├── hooks/
+│   │   └── useUSDTTransaction.ts   ✅ NEW - React hook for transactions
+│   ├── pages/
+│   │   └── Swap.tsx               ✅ UPDATED - Integrated real USDT
+│   ├── services/
+│   │   └── usdtService.ts         ✅ NEW - SolanaUSDTService, TronUSDTService
+│   ├── styles/
+│   │   └── Navigation.css          ✅ UPDATED - Gold/green button styling
+│   ├── utils/
+│   │   └── usdtValidator.ts       ✅ NEW - Validation & monitoring
+│   └── config/
+│       └── usdtConfig.ts          (existing config file)
+├── .env.local                      ✅ NEW - Configuration
+├── setup-usdt.sh                   ✅ NEW - Setup script
+├── USDT_TESTING_GUIDE.md           ✅ NEW - Test instructions
+├── REAL_USDT_TRANSACTIONS.md       ✅ UPDATED - Service documentation
+└── INTEGRATION_GUIDE.md            ✅ NEW - This file
 ```
 
 ---
 
-## 🔗 Integration Steps
+## 🔧 Installation
 
-### Step 1: Integrate Original Website into App
-
-The original website (`AFRICOIN\index.html`) should be accessible as:
-
-```
-App Home (/)
-├── Landing Page (from original index.html)
-├── Features Section
-├── Testimonials
-└── CTA: "Launch App" → /dashboard
-```
-
-**Option 1: Migration** (Recommended)
+### Step 1: Install Dependencies
 
 ```bash
-# Navigate to frontend
-cd src/pages
-
-# Create HomePage that includes original website content
-# This will serve as the main landing page before dashboard
+npm install @solana/web3.js @solana/spl-token @solana/wallet-adapter-react @solana/wallet-adapter-react-ui tronweb axios
 ```
 
-**Option 2: Embed as iframe** (Quick)
+### Step 2: Create Environment File
 
-```tsx
-// In Home.tsx
-<iframe src="path/to/original/index.html" style={{width: '100%', height: '100%'}} />
+```bash
+# Copy and customize
+cp .env.example .env.local
 ```
+
+**`.env.local` Configuration:**
+
+```env
+# Network Mode: testnet or mainnet
+REACT_APP_NETWORK=testnet
+
+# Solana Configuration
+REACT_APP_SOLANA_RPC=https://api.devnet.solana.com
+REACT_APP_SOLANA_USDT_MINT=EhYXq3bffpgB1mCvPxZBU1dm5MnnPtQqaunTs9qKV1F9
+
+# TRON Configuration  
+REACT_APP_TRON_API=https://api.shasta.trongrid.io
+REACT_APP_TRON_USDT_ADDRESS=TG3XXyExBkPp9nzdajQjthH6ykqS3koN21
+
+# Debug Mode
+REACT_APP_DEBUG=true
+REACT_APP_LOG_TRANSACTIONS=true
+```
+
+### Step 3: Run Setup Script
+
+```bash
+bash setup-usdt.sh
+```
+
+This script will:
+- ✅ Install all dependencies
+- ✅ Create `.env.local` file
+- ✅ Verify installation
+- ✅ Display next steps
+
+---
+
+## 📚 Usage Examples
+
+### Example 1: Check USDT Balance
+
+```typescript
+import { solanaUSDT, tronUSDT } from '../services/usdtService';
+
+// Check Solana USDT balance
+async function checkSolanaBalance() {
+  const walletAddress = 'EPjFWaLb3odccccccccccccccccccccccccccG';
+  const balance = await solanaUSDT.getUSDTBalance(walletAddress);
+  console.log(`Balance: ${balance} USDT`);
+}
+
+// Check TRON USDT balance
+async function checkTronBalance() {
+  const walletAddress = 'TR7NHqjeKQxGTCi8q282JOKUYJUARIPEY6';
+  const balance = await tronUSDT.getUSDTBalance(walletAddress);
+  console.log(`Balance: ${balance} USDT`);
+}
+```
+
+### Example 2: Transfer USDT (React Component)
+
+```typescript
+import { useUSDTTransaction } from '../hooks/useUSDTTransaction';
+
+function TransferComponent() {
+  const { sendUSDT, isLoading, error, clearError } = useUSDTTransaction({
+    onSuccess: (result) => {
+      console.log('Transfer successful!', result);
+    },
+    onError: (error) => {
+      console.error('Transfer failed:', error);
+    }
+  });
+
+  const handleTransfer = async () => {
+    try {
+      const result = await sendUSDT({
+        blockchain: 'solana',
+        toAddress: 'RECIPIENT_WALLET_ADDRESS',
+        amount: 100,
+        keypair: userKeypair, // or privateKey for TRON
+      });
+      
+      console.log('Transaction signature:', result.txSignature);
+    } catch (err) {
+      console.error('Transfer error:', err);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleTransfer} disabled={isLoading}>
+        {isLoading ? 'Transferring...' : 'Send USDT'}
+      </button>
+      {error && (
+        <div className="error">
+          {error}
+          <button onClick={clearError}>Dismiss</button>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Example 3: Validate Transfer Before Sending
+
+```typescript
+import { USDTValidator } from '../utils/usdtValidator';
+
+async function validateBeforeTransfer(
+  fromAddress: string,
+  toAddress: string,
+  amount: number,
+  blockchain: 'solana' | 'tron',
+  currentBalance: number
+) {
+  // Validate the entire transfer
+  const validation = USDTValidator.validateTransfer(
+    fromAddress,
+    toAddress,
+    amount,
+    blockchain,
+    currentBalance
+  );
+
+  if (!validation.valid) {
+    console.error('Validation failed:', validation.error);
+    return false;
+  }
+
+  // Check for warnings (e.g., high amount)
+  if (validation.warnings && validation.warnings.length > 0) {
+    console.warn('Transfer warnings:', validation.warnings);
+    // Show user confirmation dialog for large amounts
+  }
+
+  return true;
+}
+```
+
+### Example 4: Monitor Transaction Status
+
+```typescript
+import { transactionMonitor } from '../utils/usdtValidator';
+
+async function trackTransaction(txHash: string, blockchain: string) {
+  console.log('Monitoring transaction:', txHash);
+
+  const result = await transactionMonitor.monitorTransaction(txHash, blockchain);
+
+  if (result.confirmed) {
+    console.log('✅ Transaction confirmed!');
+    console.log('Confirmations:', result.confirmations);
+  } else if (result.failed) {
+    console.log('❌ Transaction failed');
+    console.log('Error:', result.error);
+  } else if (result.pending) {
+    console.log('⏳ Still pending after timeout');
+  }
+}
+```
+
+---
+
+## 🧪 Testing
+
+### Quick Test (No Real Transactions)
+
+```bash
+npm test -- usdtValidator.test.ts
+```
+
+### Testnet Integration Test
+
+1. **Get testnet tokens:**
+   ```bash
+   # Solana Devnet SOL
+   solana airdrop 2 <YOUR_WALLET> --url devnet
+   
+   # TRON Shasta TRX
+   # Visit: https://www.trongrid.io/shasta/
+   ```
+
+2. **Update .env.local:**
+   ```env
+   REACT_APP_NETWORK=testnet
+   REACT_APP_SOLANA_RPC=https://api.devnet.solana.com
+   REACT_APP_TRON_API=https://api.shasta.trongrid.io
+   ```
+
+3. **Run test component:**
+   ```typescript
+   import { solanaUSDT } from '../services/usdtService';
+   
+   async function testTransfer() {
+     // Test balance query
+     const balance = await solanaUSDT.getUSDTBalance(testWallet);
+     console.log('Balance:', balance);
+     
+     // Test transfer (on devnet)
+     const result = await solanaUSDT.transferUSDT(keypair, recipient, 1);
+     console.log('Result:', result);
+   }
+   ```
+
+### See Full Test Guide
+
+For comprehensive testing instructions, see: [USDT_TESTING_GUIDE.md](./USDT_TESTING_GUIDE.md)
+
+---
+
+## 🔄 API Reference
+
+### SolanaUSDTService
+
+```typescript
+import { solanaUSDT } from '../services/usdtService';
+
+// Get USDT balance (in USDT, not lamports)
+const balance = await solanaUSDT.getUSDTBalance(walletAddress: string);
+
+// Transfer USDT
+const result = await solanaUSDT.transferUSDT(
+  fromKeypair: Keypair,
+  toAddress: string,
+  amount: number  // in USDT
+);
+
+// Get USDT price in USD
+const price = await solanaUSDT.getUSDTPrice();
+
+// Check transaction status
+const status = await solanaUSDT.getTransactionStatus(txSignature: string);
+
+// Get transaction history
+const history = await solanaUSDT.getTransactionHistory(
+  walletAddress: string,
+  limit?: number
+);
+```
+
+### TronUSDTService
+
+```typescript
+import { tronUSDT } from '../services/usdtService';
+
+// Get USDT balance (in USDT)
+const balance = await tronUSDT.getUSDTBalance(walletAddress: string);
+
+// Transfer USDT
+const result = await tronUSDT.transferUSDT(
+  fromAddress: string,
+  toAddress: string,
+  amount: number,  // in USDT
+  privateKey: string
+);
+
+// Get USDT price
+const price = await tronUSDT.getUSDTPrice();
+
+// Check transaction status
+const status = await tronUSDT.getTransactionStatus(txHash: string);
+
+// Get contract ABI
+const abi = tronUSDT.getUSDTABI();
+```
+
+### UnifiedUSDTService
+
+```typescript
+import { unifiedUSDT } from '../services/usdtService';
+
+// Get balances from both chains
+const balances = await unifiedUSDT.getMultiChainBalance(
+  solanaWallet: string,
+  tronWallet: string
+);
+
+// Get USDT price (same for both)
+const price = await unifiedUSDT.getUSDTPrice();
+
+// Transfer on Solana
+const solanaResult = await unifiedUSDT.transferUSDTSolana(
+  keypair: Keypair,
+  toAddress: string,
+  amount: number
+);
+
+// Transfer on TRON
+const tronResult = await unifiedUSDT.transferUSDTTron(
+  fromAddress: string,
+  toAddress: string,
+  amount: number,
+  privateKey: string
+);
+
+// Check status (works for both)
+const status = await unifiedUSDT.getTransactionStatus(
+  txHash: string,
+  blockchain: 'solana' | 'tron'
+);
+```
+
+### USDTValidator
+
+```typescript
+import { USDTValidator, transactionMonitor } from '../utils/usdtValidator';
+
+// Validate address format
+const addressValidation = USDTValidator.validateAddress(
+  address: string,
+  blockchain: 'solana' | 'tron' | 'ethereum'
+);
+
+// Validate amount range
+const amountValidation = USDTValidator.validateAmount(
+  amount: number,
+  token: string
+);
+
+// Comprehensive transfer validation
+const fullValidation = USDTValidator.validateTransfer(
+  fromAddress: string,
+  toAddress: string,
+  amount: number,
+  blockchain: string,
+  currentBalance: number
+);
+
+// Monitor transaction status
+const txStatus = await transactionMonitor.monitorTransaction(
+  txHash: string,
+  blockchain: string
+);
+
+// Sanitize user input (XSS prevention)
+const cleanInput = USDTValidator.sanitizeInput(userInput: string);
+```
+
+### useUSDTTransaction Hook
+
+```typescript
+import { useUSDTTransaction } from '../hooks/useUSDTTransaction';
+
+const {
+  sendUSDT,           // Async function to send USDT
+  getBalance,         // Get multi-chain balance
+  getPrice,           // Get USDT price
+  checkStatus,        // Check transaction status
+  isLoading,          // Loading state
+  error,              // Error message
+  lastTransaction,    // Result of last transaction
+  clearError,         // Clear error state
+} = useUSDTTransaction({
+  onSuccess: (result) => { /* ... */ },
+  onError: (error) => { /* ... */ }
+});
+```
+
+---
+
+## 🛡️ Security Checklist
+
+Before going to production:
+
+- [ ] **Private Keys**: Never expose in code or logs
+  ```typescript
+  // ❌ WRONG
+  const pk = 'abc123...';
+  
+  // ✅ RIGHT
+  const pk = process.env.REACT_APP_PRIVATE_KEY;
+  ```
+
+- [ ] **HTTPS Only**: Always use HTTPS in production
+  ```env
+  REACT_APP_API_URL=https://...  # Not http://
+  ```
+
+- [ ] **Environment Variables**: All sensitive data in `.env.local`
+  ```bash
+  git add .env.local  # Add to .gitignore
+  ```
+
+- [ ] **Rate Limiting**: Prevent accidental mass transfers
+  ```typescript
+  if (!canMakeRequest()) return; // See rate limiting section
+  ```
+
+- [ ] **Audit Logs**: Log all transactions
+  ```typescript
+  console.log('User transferred USDT:', {
+    from, to, amount, timestamp, status
+  });
+  ```
+
+- [ ] **Testnet First**: Always test on devnet/shasta before mainnet
+  ```env
+  REACT_APP_NETWORK=testnet  # During development
+  ```
+
+---
+
+## 🔴 Common Issues & Solutions
+
+### Issue 1: "Token account does not exist"
+
+**Cause**: Associated Token Account (ATA) not created  
+**Solution**:
+```typescript
+import { getAssociatedTokenAddressSync } from '@solana/spl-token';
+
+const ata = getAssociatedTokenAddressSync(USDT_MINT, userWallet);
+```
+
+### Issue 2: "Insufficient balance"
+
+**Cause**: User balance too low  
+**Solution**:
+```typescript
+// Always check balance before transfer
+const balance = await solanaUSDT.getUSDTBalance(userWallet);
+if (balance < amount) {
+  throw new Error('Insufficient balance');
+}
+```
+
+### Issue 3: Transaction Timeout
+
+**Cause**: Network congestion  
+**Solution**:
+```env
+REACT_APP_TX_TIMEOUT=120000  # Increase to 2 minutes
+```
+
+### Issue 4: RPC Rate Limiting
+
+**Cause**: Too many API calls  
+**Solution**:
+```typescript
+// Implement caching and rate limiting
+const cache = new Map();
+const lastCall = {};
+
+function canCall(): boolean {
+  const now = Date.now();
+  if (now - lastCall > 1000) {
+    lastCall = now;
+    return true;
+  }
+  return false;
+}
+```
+
+---
+
+## 📞 Support Resources
+
+- 📖 [Solana Documentation](https://docs.solana.com)
+- 🔗 [TRON Developer Guide](https://developers.tron.network)
+- 🧪 [Solana Devnet Faucet](https://faucet.solana.com)
+- 🧪 [TRON Shasta Faucet](https://www.trongrid.io/shasta/)
+- 💬 [GitHub Issues](https://github.com/africoin-io/africoin-app/issues)
+
+---
+
+## 📋 Deployment Checklist
+
+- [ ] All tests passing (unit + integration)
+- [ ] Environment variables configured
+- [ ] Private keys secured (.env.local in .gitignore)
+- [ ] HTTPS enabled
+- [ ] Rate limiting implemented
+- [ ] Error handling complete
+- [ ] Transaction logging enabled
+- [ ] User confirmation dialogs added
+- [ ] Testnet verification complete
+- [ ] Code reviewed by team
+- [ ] Documentation updated
+- [ ] Backup and recovery procedures in place
+
+---
+
+## Next Steps
+
+1. **Read [USDT_TESTING_GUIDE.md](./USDT_TESTING_GUIDE.md)** for detailed testing instructions
+2. **Run setup script**: `bash setup-usdt.sh`
+3. **Test on devnet/shasta**: Verify integration before mainnet
+4. **Deploy to production**: Follow mainnet migration checklist
+
+Happy coding! 🚀
 
 ### Step 2: Backend API Setup
 

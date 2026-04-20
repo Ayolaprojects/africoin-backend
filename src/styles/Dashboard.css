@@ -211,3 +211,571 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Dashboard Tabs */
+.dashboard-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.dashboard-tabs .tab {
+  background: none;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.dashboard-tabs .tab:hover {
+  color: var(--text);
+}
+
+.dashboard-tabs .tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Zimbabwe Section */
+.zimbabwe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.zimbabwe-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.zimbabwe-header h2 {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Exchange Rate Card */
+.exchange-rate-card {
+  background: linear-gradient(135deg, #1a5f3f 0%, #2d7d5f 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(26, 95, 63, 0.2);
+  margin-bottom: 2rem;
+}
+
+.exchange-rate-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.rates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.rate-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.rate-label {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.rate-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Payment Methods */
+.payment-methods {
+  margin-bottom: 2rem;
+}
+
+.payment-methods h3 {
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.method-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.method-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(26, 95, 63, 0.1);
+  transform: translateY(-2px);
+}
+
+.method-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.method-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.method-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Zimbabwe Analytics */
+.zimbabwe-analytics {
+  margin-bottom: 2rem;
+}
+
+.zimbabwe-analytics h3 {
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.analytics-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.analytics-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.analytics-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Zimbabwe Transactions */
+.zimbabwe-transactions {
+  margin-bottom: 2rem;
+}
+
+.zimbabwe-tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.zimbabwe-tx-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.zimbabwe-tx-item .tx-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zimbabwe-tx-item .tx-method {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.zimbabwe-tx-item .tx-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.zimbabwe-tx-item .tx-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zimbabwe-tx-item .tx-amount {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.zimbabwe-tx-item .tx-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.zimbabwe-tx-item .tx-status.completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.zimbabwe-tx-item .tx-status.pending {
+  background: rgba(251, 146, 60, 0.1);
+  color: #fb923c;
+}
+
+.zimbabwe-tx-item .tx-status.failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* Zimbabwe Actions */
+.zimbabwe-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .methods-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .zimbabwe-tx-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .zimbabwe-tx-item .tx-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dashboard-tabs {
+    gap: 0.5rem;
+  }
+
+  .dashboard-tabs .tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Dashboard Tabs */
+.dashboard-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.dashboard-tabs .tab {
+  background: none;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.dashboard-tabs .tab:hover {
+  color: var(--text);
+}
+
+.dashboard-tabs .tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Zimbabwe Section */
+.zimbabwe-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.zimbabwe-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.zimbabwe-header h2 {
+  font-size: 1.8rem;
+  color: var(--text);
+  margin: 0;
+}
+
+/* Exchange Rate Card */
+.exchange-rate-card {
+  background: linear-gradient(135deg, #1a5f3f 0%, #2d7d5f 100%);
+  border-radius: 12px;
+  padding: 2rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(26, 95, 63, 0.2);
+  margin-bottom: 2rem;
+}
+
+.exchange-rate-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.rates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.rate-item {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.rate-label {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.rate-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* Payment Methods */
+.payment-methods {
+  margin-bottom: 2rem;
+}
+
+.payment-methods h3 {
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.method-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.method-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(26, 95, 63, 0.1);
+  transform: translateY(-2px);
+}
+
+.method-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.method-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.method-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Zimbabwe Analytics */
+.zimbabwe-analytics {
+  margin-bottom: 2rem;
+}
+
+.zimbabwe-analytics h3 {
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.analytics-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.analytics-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.analytics-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Zimbabwe Transactions */
+.zimbabwe-transactions {
+  margin-bottom: 2rem;
+}
+
+.zimbabwe-tx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.zimbabwe-tx-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.zimbabwe-tx-item .tx-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zimbabwe-tx-item .tx-method {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.zimbabwe-tx-item .tx-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.zimbabwe-tx-item .tx-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.zimbabwe-tx-item .tx-amount {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.zimbabwe-tx-item .tx-status {
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.zimbabwe-tx-item .tx-status.completed {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+}
+
+.zimbabwe-tx-item .tx-status.pending {
+  background: rgba(251, 146, 60, 0.1);
+  color: #fb923c;
+}
+
+.zimbabwe-tx-item .tx-status.failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+/* Zimbabwe Actions */
+.zimbabwe-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .methods-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .zimbabwe-tx-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .zimbabwe-tx-item .tx-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dashboard-tabs {
+    gap: 0.5rem;
+  }
+
+  .dashboard-tabs .tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}

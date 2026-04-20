@@ -621,3 +621,130 @@
     font-size: 0.7rem;
   }
 }
+
+/* Zimbabwe Payment Styles */
+.zimbabwe-form {
+  background: linear-gradient(135deg, rgba(26, 95, 63, 0.05) 0%, rgba(45, 125, 95, 0.05) 100%);
+  border: 2px solid rgba(26, 95, 63, 0.2);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.zimbabwe-form h3 {
+  color: #1a5f3f;
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.zimbabwe-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.zimbabwe-form .form-group label {
+  color: #1a5f3f;
+  font-weight: 600;
+}
+
+.zimbabwe-form input {
+  border: 1px solid rgba(26, 95, 63, 0.3) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.zimbabwe-form input:focus {
+  border-color: #1a5f3f !important;
+  outline: none;
+  box-shadow: 0 0 8px rgba(26, 95, 63, 0.2);
+}
+
+/* Zimbabwe Confirmation Form */
+.zimbabwe-confirm-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.zimbabwe-confirm-form h2 {
+  font-size: 1.3rem;
+  color: #1a5f3f;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.zimbabwe-confirm-form p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.zimbabwe-confirm-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.zimbabwe-confirm-form input {
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  font-weight: 600;
+}
+
+.zimbabwe-confirm-form small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #f39c12;
+  font-size: 0.8rem;
+}
+
+/* Method Button Zimbabwe Specific */
+.method-btn.zimbabwe {
+  background: linear-gradient(135deg, rgba(26, 95, 63, 0.1) 0%, rgba(45, 125, 95, 0.1) 100%);
+  border: 2px solid rgba(26, 95, 63, 0.3);
+  color: #1a5f3f;
+  transition: all 0.3s ease;
+}
+
+.method-btn.zimbabwe:hover {
+  background: linear-gradient(135deg, rgba(26, 95, 63, 0.15) 0%, rgba(45, 125, 95, 0.15) 100%);
+  border-color: #1a5f3f;
+}
+
+.method-btn.zimbabwe.selected {
+  background: linear-gradient(135deg, rgba(26, 95, 63, 0.2) 0%, rgba(45, 125, 95, 0.2) 100%);
+  border-color: #1a5f3f;
+  color: #1a5f3f;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(26, 95, 63, 0.2);
+}
+
+@media (max-width: 640px) {
+  .zimbabwe-form {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .zimbabwe-form h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .zimbabwe-confirm-form h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .zimbabwe-confirm-form .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .zimbabwe-confirm-form input {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+}

@@ -20,6 +20,7 @@ import Swap from './pages/Swap';
 import PaymentGateway from './pages/PaymentGateway';
 import Transactions from './pages/Transactions';
 import Banking from './pages/Banking';
+import ZimbabwePage from './pages/ZimbabwePage';
 
 // Components
 import Navigation from './components/Navigation';
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/payments" element={<PaymentGateway />} />
                 <Route path="/transactions" element={<Transactions />} />
                 <Route path="/banking" element={<Banking />} />
+                <Route path="/zimbabwe" element={<ZimbabwePage />} />
               </Routes>
             </main>
             <Footer />

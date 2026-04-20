@@ -120,6 +120,57 @@
   gap: 0.75rem;
 }
 
+/* Custom wallet button styling - hide default purple button */
+.wallet-connect {
+  display: flex;
+  align-items: center;
+}
+
+/* Hide the default Solana wallet adapter button styling */
+.wallet-connect button {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(52, 211, 153, 0.1)) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  color: var(--text) !important;
+  font-size: 0.85rem !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.25s ease !important;
+  font-family: inherit !important;
+}
+
+.wallet-connect button:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(52, 211, 153, 0.15)) !important;
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2) !important;
+}
+
+.wallet-connect button:active {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(52, 211, 153, 0.2)) !important;
+}
+
+/* Hide the default Solana button icon if visible */
+.wallet-connect svg {
+  display: none !important;
+}
+
+/* Style wallet adapter menu */
+.wallet-adapter-dropdown-list {
+  background: rgba(2, 6, 23, 0.95) !important;
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  border-radius: 8px !important;
+}
+
+.wallet-adapter-dropdown-list-item {
+  color: var(--text) !important;
+  font-size: 0.85rem !important;
+}
+
+.wallet-adapter-dropdown-list-item:hover {
+  background: rgba(251, 191, 36, 0.1) !important;
+  color: var(--gold) !important;
+}
+
 @media (max-width: 768px) {
   .nav-links {
     display: none;
@@ -144,5 +195,10 @@
   .nav-cta {
     flex-direction: column;
     gap: 0.5rem;
+  }
+  
+  .wallet-connect button {
+    width: 100%;
+    justify-content: center;
   }
 }

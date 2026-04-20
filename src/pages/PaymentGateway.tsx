@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { paymentService, PaymentRequest } from '../services/paymentService';
 import { kycService, KYCUser } from '../services/kycService';
+import { zimbabweService } from '../services/zimbabweService';
 import '../styles/PaymentGateway.css';
 
 const PaymentGateway: React.FC = () => {
-  const [step, setStep] = useState<'payment' | 'kyc' | 'bank'>('payment');
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'payfast' | 'luno'>('stripe');
+  const [step, setStep] = useState<'payment' | 'kyc' | 'bank' | 'zimbabwe'>('payment');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'payfast' | 'luno' | 'ecocash' | 'payzone' | 'kwese'>('stripe');
   const [country, setCountry] = useState('ZA');
   const [amount, setAmount] = useState(100);
-  const [currency, setCurrency] = useState<'USDT' | 'ZAR' | 'USD'>('USDT');
+  const [currency, setCurrency] = useState<'USDT' | 'ZAR' | 'USD' | 'ZWL'>('USDT');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
@@ -26,26 +27,52 @@ const PaymentGateway: React.FC = () => {
   const [accountNumber, setAccountNumber] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
 
+  // Zimbabwe specific states
+  const [ecocashPhone, setEcocashPhone] = useState('');
+  const [ecocashPin, setEcocashPin] = useState('');
+  const [cassavaRecipient, setCassavaRecipient] = useState('');
+
   const handlePayment = async () => {
     setLoading(true);
     try {
-      const request: PaymentRequest = {
-        amount,
-        currency,
-        method: paymentMethod,
-        country: country as 'ZA' | 'US' | 'GB' | 'EU',
-        metadata: {
-          bankAccount: {
-            bankName,
-            accountNumber,
-            accountHolder,
+      if (paymentMethod.startsWith('ecocash')) {
+        // Handle EcoCash
+        const txResult = await zimbabweService.initiateEcoCash({
+          phoneNumber: ecocashPhone,
+          amount,
+          transactionType: paymentMethod === 'ecocash' ? 'money_transfer' : 'airtime',
+        });
+        setResult(txResult);
+        setStep('zimbabwe');
+      } else if (paymentMethod === 'payzone' || paymentMethod === 'kwese') {
+        // Handle Cassava (PayZone, Kwese)
+        const txResult = await zimbabweService.initiateCassava({
+          method: paymentMethod === 'payzone' ? 'payzone' : 'kwese_remit',
+          amount,
+          recipient: cassavaRecipient,
+        });
+        setResult(txResult);
+        setStep('zimbabwe');
+      } else {
+        // Handle standard payment methods
+        const request: PaymentRequest = {
+          amount,
+          currency,
+          method: paymentMethod as any,
+          country: country as 'ZA' | 'US' | 'GB' | 'EU',
+          metadata: {
+            bankAccount: {
+              bankName,
+              accountNumber,
+              accountHolder,
+            },
           },
-        },
-      };
+        };
 
-      const response = await paymentService.processPayment(request);
-      setResult(response);
-      setStep('kyc');
+        const response = await paymentService.processPayment(request);
+        setResult(response);
+        setStep('kyc');
+      }
     } catch (error) {
       alert(`Payment error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
@@ -71,8 +98,34 @@ const PaymentGateway: React.FC = () => {
     }
   };
 
-  const availableMethods = paymentService.getAvailablePaymentMethods(country);
-  const sasBanks = paymentService.getSouthAfricanBanks();
+  const handleZimbabweConfirm = async () => {
+    setLoading(true);
+    try {
+      if (paymentMethod.startsWith('ecocash')) {
+        await zimbabweService.confirmEcoCashPin(result.reference, ecocashPin);
+        alert('EcoCash transaction confirmed!');
+      } else if (paymentMethod === 'payzone' || paymentMethod === 'kwese') {
+        await zimbabweService.confirmCassavaTransaction(result.reference, ecocashPin);
+        alert('Cassava transaction confirmed!');
+      }
+      setStep('payment');
+      setResult(null);
+    } catch (error) {
+      alert(`Confirmation error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAvailablePaymentMethods = () => {
+    if (country === 'ZW') {
+      return zimbabweService.getAvailablePaymentMethods();
+    }
+    return paymentService.getAvailablePaymentMethods(country);
+  };
+
+  const availableMethods = getAvailablePaymentMethods();
+  const banks = country === 'ZW' ? zimbabweService.getZimbabweanBanks() : paymentService.getSouthAfricanBanks();
 
   return (
     <div className="payment-gateway">
@@ -93,6 +146,10 @@ const PaymentGateway: React.FC = () => {
             <span className="step-number">3</span>
             <span className="step-label">Bank Details</span>
           </div>
+          <div className={`step ${step === 'zimbabwe' ? 'active' : ''}`}>
+            <span className="step-number">4</span>
+            <span className="step-label">Zimbabwe Confirm</span>
+          </div>
         </div>
 
         {/* Payment Step */}
@@ -102,6 +159,7 @@ const PaymentGateway: React.FC = () => {
               <label>Country</label>
               <select value={country} onChange={(e) => setCountry(e.target.value)}>
                 <option value="ZA">South Africa</option>
+                <option value="ZW">🇿🇼 Zimbabwe</option>
                 <option value="US">United States</option>
                 <option value="GB">United Kingdom</option>
                 <option value="EU">Europe</option>
@@ -119,8 +177,17 @@ const PaymentGateway: React.FC = () => {
                 />
                 <select value={currency} onChange={(e) => setCurrency(e.target.value as any)}>
                   <option value="USDT">USDT</option>
-                  <option value="ZAR">ZAR</option>
-                  <option value="USD">USD</option>
+                  {country === 'ZW' ? (
+                    <>
+                      <option value="ZWL">ZWL</option>
+                      <option value="USD">USD</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="ZAR">ZAR</option>
+                      <option value="USD">USD</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>
@@ -128,23 +195,97 @@ const PaymentGateway: React.FC = () => {
             <div className="form-group">
               <label>Payment Method</label>
               <div className="payment-methods">
-                {availableMethods.map((method) => (
-                  <button
-                    key={method}
-                    className={`method-btn ${paymentMethod === method ? 'selected' : ''}`}
-                    onClick={() => setPaymentMethod(method as any)}
-                  >
-                    {method === 'stripe' && '💳 Stripe (Global)'}
-                    {method === 'bank_transfer' && '🏦 Bank Transfer (SA)'}
-                    {method === 'payfast' && '⚡ PayFast (SA)'}
-                    {method === 'luno' && '₿ Luno (Crypto)'}
-                  </button>
-                ))}
+                {country === 'ZW' ? (
+                  <>
+                    <button
+                      className={`method-btn zimbabwe ${paymentMethod === 'ecocash' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('ecocash')}
+                    >
+                      💚 EcoCash Transfer
+                    </button>
+                    <button
+                      className={`method-btn zimbabwe ${paymentMethod === 'ecocash_airtime' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('ecocash_airtime')}
+                    >
+                      📱 EcoCash Airtime
+                    </button>
+                    <button
+                      className={`method-btn zimbabwe ${paymentMethod === 'payzone' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('payzone')}
+                    >
+                      🏪 PayZone
+                    </button>
+                    <button
+                      className={`method-btn zimbabwe ${paymentMethod === 'kwese' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('kwese')}
+                    >
+                      📡 Kwese Remit
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      className={`method-btn ${paymentMethod === 'stripe' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('stripe')}
+                    >
+                      💳 Stripe (Global)
+                    </button>
+                    <button
+                      className={`method-btn ${paymentMethod === 'bank_transfer' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('bank_transfer')}
+                    >
+                      🏦 Bank Transfer (SA)
+                    </button>
+                    <button
+                      className={`method-btn ${paymentMethod === 'payfast' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('payfast')}
+                    >
+                      ⚡ PayFast (SA)
+                    </button>
+                    <button
+                      className={`method-btn ${paymentMethod === 'luno' ? 'selected' : ''}`}
+                      onClick={() => setPaymentMethod('luno')}
+                    >
+                      ₿ Luno (Crypto)
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
+            {/* Zimbabwe Payment Methods */}
+            {country === 'ZW' && (paymentMethod === 'ecocash' || paymentMethod === 'ecocash_airtime') && (
+              <div className="zimbabwe-form">
+                <h3>💚 EcoCash Payment</h3>
+                <div className="form-group">
+                  <label>EcoCash Phone Number</label>
+                  <input
+                    type="tel"
+                    value={ecocashPhone}
+                    onChange={(e) => setEcocashPhone(e.target.value)}
+                    placeholder="+263-78-xxx-xxxx"
+                  />
+                </div>
+              </div>
+            )}
+
+            {country === 'ZW' && (paymentMethod === 'payzone' || paymentMethod === 'kwese') && (
+              <div className="zimbabwe-form">
+                <h3>{paymentMethod === 'payzone' ? '🏪 PayZone' : '📡 Kwese Remit'}</h3>
+                <div className="form-group">
+                  <label>Recipient</label>
+                  <input
+                    type="text"
+                    value={cassavaRecipient}
+                    onChange={(e) => setCassavaRecipient(e.target.value)}
+                    placeholder="Recipient name/account"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Bank Transfer Details */}
-            {paymentMethod === 'bank_transfer' && (
+            {paymentMethod === 'bank_transfer' && country !== 'ZW' && (
               <>
                 <div className="form-group">
                   <label>Bank Name</label>
@@ -305,11 +446,45 @@ const PaymentGateway: React.FC = () => {
           </div>
         )}
 
+        {/* Zimbabwe Confirmation Step */}
+        {step === 'zimbabwe' && (
+          <div className="zimbabwe-confirm-form">
+            <h2>🇿🇼 Confirm Your Payment</h2>
+            <p>Transaction ID: {result?.reference}</p>
+            <p>Amount: {amount} {currency}</p>
+
+            <div className="form-group">
+              <label>Enter PIN to Confirm</label>
+              <input
+                type="password"
+                value={ecocashPin}
+                onChange={(e) => setEcocashPin(e.target.value)}
+                placeholder="Enter your PIN"
+                maxLength="4"
+              />
+              <small>A confirmation SMS has been sent to your registered number</small>
+            </div>
+
+            <div className="button-group">
+              <button className="btn-secondary" onClick={() => setStep('payment')}>
+                Back
+              </button>
+              <button
+                className="btn-primary"
+                onClick={handleZimbabweConfirm}
+                disabled={loading || !ecocashPin}
+              >
+                {loading ? 'Confirming...' : 'Confirm Payment'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Success Message */}
         {result && (
           <div className="success-message">
             <h2>✅ Payment Initiated</h2>
-            <p>Transaction ID: {result.transactionId}</p>
+            <p>Transaction ID: {result.transactionId || result.reference}</p>
             <p>Status: {result.status}</p>
             <p>Amount: {result.amount} {result.currency}</p>
             {result.paymentUrl && (
