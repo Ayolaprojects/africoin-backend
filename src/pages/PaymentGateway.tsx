@@ -5,11 +5,12 @@ import { zimbabweService } from '../services/zimbabweService';
 import '../styles/PaymentGateway.css';
 
 const PaymentGateway: React.FC = () => {
+  const saBanks = paymentService.getSouthAfricanBanks();
   const [step, setStep] = useState<'payment' | 'kyc' | 'bank' | 'zimbabwe'>('payment');
   const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'bank_transfer' | 'payfast' | 'luno' | 'ecocash' | 'ecocash_airtime' | 'payzone' | 'kwese'>('stripe');
   const [country, setCountry] = useState('ZA');
   const [amount, setAmount] = useState(100);
-  const [currency, setCurrency] = useState<'USDT' | 'ZAR' | 'USD' | 'ZWL'>('USDT');
+  const [currency, setCurrency] = useState<'USDT' | 'ZAR' | 'USD' | 'EUR' | 'ZWL'>('USDT');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
@@ -55,9 +56,11 @@ const PaymentGateway: React.FC = () => {
         setStep('zimbabwe');
       } else {
         // Handle standard payment methods
+        const paymentCurrency: PaymentRequest['currency'] = currency === 'ZWL' ? 'USD' : currency;
+
         const request: PaymentRequest = {
           amount,
-          currency,
+          currency: paymentCurrency,
           method: paymentMethod as any,
           country: country as 'ZA' | 'US' | 'GB' | 'EU',
           metadata: {
@@ -117,12 +120,7 @@ const PaymentGateway: React.FC = () => {
     }
   };
 
-  const getAvailablePaymentMethods = () => {
-    if (country === 'ZW') {
-      return zimbabweService.getAvailablePaymentMethods();
-    }
-    return paymentService.getAvailablePaymentMethods(country);
-  };
+  // No longer using getAvailablePaymentMethods - methods determined by country state
 
   return (
     <div className="payment-gateway">
@@ -287,7 +285,7 @@ const PaymentGateway: React.FC = () => {
                 <div className="form-group">
                   <label>Bank Name</label>
                   <select value={bankName} onChange={(e) => setBankName(e.target.value)}>
-                    {sasBanks.map((bank) => (
+                    {saBanks.map((bank) => (
                       <option key={bank} value={bank}>
                         {bank}
                       </option>
@@ -404,7 +402,7 @@ const PaymentGateway: React.FC = () => {
             <div className="form-group">
               <label>Bank Name</label>
               <select value={bankName} onChange={(e) => setBankName(e.target.value)}>
-                {sasBanks.map((bank) => (
+                {saBanks.map((bank) => (
                   <option key={bank} value={bank}>
                     {bank}
                   </option>
@@ -457,7 +455,7 @@ const PaymentGateway: React.FC = () => {
                 value={ecocashPin}
                 onChange={(e) => setEcocashPin(e.target.value)}
                 placeholder="Enter your PIN"
-                maxLength="4"
+                maxLength={4}
               />
               <small>A confirmation SMS has been sent to your registered number</small>
             </div>

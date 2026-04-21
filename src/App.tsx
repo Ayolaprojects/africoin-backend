@@ -1,67 +1,112 @@
-import { useMemo } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import {
-  PhantomWalletAdapter,
-  SolflareWalletAdapter,
-  BackpackWalletAdapter,
-} from '@solana/wallet-adapter-wallets';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
-import '@solana/wallet-adapter-react-ui/styles.css';
 import './styles/global.css';
-
-// Pages
-import Dashboard from './pages/Dashboard';
-import Home from './pages/Home';
-import Services from './pages/Services';
-import Swap from './pages/Swap';
-import PaymentGateway from './pages/PaymentGateway';
-import Transactions from './pages/Transactions';
-import Banking from './pages/Banking';
-import ZimbabwePage from './pages/ZimbabwePage';
 
 // Components
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 
-function App() {
-  const network = WalletAdapterNetwork.Mainnet;
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+function lazyWithPreload<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+) {
+  const Component = lazy(factory) as React.LazyExoticComponent<T> & {
+    preload: () => Promise<{ default: T }>;
+  };
 
-  const wallets = useMemo(
-    () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new BackpackWalletAdapter(),
-    ],
-    []
+  Component.preload = factory;
+  return Component;
+}
+
+const Home = lazyWithPreload(() => import('./pages/Home'));
+const Dashboard = lazyWithPreload(() => import('./pages/Dashboard'));
+const Services = lazyWithPreload(() => import('./pages/Services'));
+const Swap = lazyWithPreload(() => import('./pages/Swap'));
+const PaymentGateway = lazyWithPreload(() => import('./pages/PaymentGateway'));
+const Transactions = lazyWithPreload(() => import('./pages/Transactions'));
+const Banking = lazyWithPreload(() => import('./pages/Banking'));
+const ZimbabwePage = lazyWithPreload(() => import('./pages/ZimbabwePage'));
+const WalletRoutes = lazyWithPreload(() => import('./routes/WalletRoutes'));
+
+const routePreloaders = {
+  '/': Home.preload,
+  '/dashboard': () => Promise.all([WalletRoutes.preload(), Dashboard.preload()]),
+  '/services': Services.preload,
+  '/swap': () => Promise.all([WalletRoutes.preload(), Swap.preload()]),
+  '/payments': PaymentGateway.preload,
+  '/transactions': Transactions.preload,
+  '/banking': Banking.preload,
+  '/zimbabwe': ZimbabwePage.preload,
+};
+
+type RoutePath = keyof typeof routePreloaders;
+
+function RouteFallback() {
+  return (
+    <div
+      style={{
+        minHeight: 'calc(100vh - 200px)',
+        display: 'grid',
+        placeItems: 'center',
+        padding: '2rem',
+      }}
+    >
+      <div>Loading...</div>
+    </div>
   );
+}
+
+function App() {
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    if ('requestIdleCallback' in window && 'cancelIdleCallback' in window) {
+      const job = window.requestIdleCallback(() => {
+        void routePreloaders['/dashboard']();
+        void Services.preload();
+        void PaymentGateway.preload();
+      });
+
+      return () => window.cancelIdleCallback(job);
+    }
+
+    const timeoutId = globalThis.setTimeout(() => {
+      void routePreloaders['/dashboard']();
+      void Services.preload();
+      void PaymentGateway.preload();
+    }, 300);
+
+    return () => globalThis.clearTimeout(timeoutId);
+  }, []);
 
   return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>
-          <BrowserRouter>
-            <Navigation />
-            <main style={{ minHeight: 'calc(100vh - 200px)' }}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/swap" element={<Swap />} />
-                <Route path="/payments" element={<PaymentGateway />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/banking" element={<Banking />} />
-                <Route path="/zimbabwe" element={<ZimbabwePage />} />
-              </Routes>
-            </main>
-            <Footer />
-          </BrowserRouter>
-        </WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+    <BrowserRouter>
+      <Navigation
+        preloadRoute={(path) => {
+          if (path in routePreloaders) {
+            void routePreloaders[path as RoutePath]();
+          }
+        }}
+      />
+      <Suspense fallback={<RouteFallback />}>
+        <main style={{ minHeight: 'calc(100vh - 200px)' }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/payments" element={<PaymentGateway />} />
+            <Route path="/transactions" element={<Transactions />} />
+            <Route path="/banking" element={<Banking />} />
+            <Route path="/zimbabwe" element={<ZimbabwePage />} />
+            <Route element={<WalletRoutes />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/swap" element={<Swap />} />
+            </Route>
+          </Routes>
+        </main>
+      </Suspense>
+      <Footer />
+    </BrowserRouter>
   );
 }
 

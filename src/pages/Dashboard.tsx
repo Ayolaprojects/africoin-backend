@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Button from '../components/Button';
 import WalletCard from '../components/WalletCard';
 import { solanaService } from '../services/solanaService';
@@ -16,7 +17,6 @@ interface Transaction {
 }
 
 const Dashboard: React.FC = () => {
-  useConnection();
   const { publicKey } = useWallet();
   const [solBalance, setSolBalance] = useState(0);
   const [usdtBalance, setUsdtBalance] = useState(0);
@@ -116,6 +116,9 @@ const Dashboard: React.FC = () => {
         {!publicKey ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <p>Please connect your wallet to view your balance</p>
+            <div style={{ marginTop: '1rem', display: 'inline-flex' }}>
+              <WalletMultiButton />
+            </div>
           </div>
         ) : loading ? (
           <div style={{ textAlign: 'center', padding: '40px' }}>

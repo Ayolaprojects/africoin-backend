@@ -1,7 +1,7 @@
 // Real USDT Transaction Service for Solana & TRON
-import { Connection, PublicKey, Transaction, SystemProgram, sendAndConfirmTransaction, Keypair } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction, sendAndConfirmTransaction, Keypair } from '@solana/web3.js';
+// @ts-ignore
 import { getAssociatedTokenAddress, createTransferInstruction, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import TronWeb from 'tronweb';
 
 // Constants
 export const USDT_CONFIG = {
@@ -41,10 +41,8 @@ export interface TransactionResult {
 export class SolanaUSDTService {
   private connection: Connection;
   private usdtMintAddress: PublicKey;
-  private networkType: 'mainnet' | 'devnet';
 
   constructor(networkType: 'mainnet' | 'devnet' = 'mainnet') {
-    this.networkType = networkType;
     const rpcUrl = networkType === 'mainnet' 
       ? USDT_CONFIG.solana.rpcUrl 
       : USDT_CONFIG.solana.devnetUrl;
@@ -115,7 +113,7 @@ export class SolanaUSDTService {
       const transaction = new Transaction().add(transferInstruction);
       
       // Get recent blockhash
-      const { blockhash, lastValidBlockHeight } = await this.connection.getLatestBlockhash();
+      const { blockhash } = await this.connection.getLatestBlockhash();
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = fromWallet;
 
@@ -209,7 +207,7 @@ export class SolanaUSDTService {
         if (tx) {
           transactions.push({
             signature: sig.signature,
-            blockTime: sig.blocktime,
+            blockTime: sig.blockTime,
             fee: tx.meta?.fee,
             status: sig.err ? 'failed' : 'confirmed',
           });
@@ -225,23 +223,25 @@ export class SolanaUSDTService {
 
 // ============= TRON USDT SERVICE =============
 export class TronUSDTService {
-  private tronWeb: TronWeb;
+  private apiUrl: string;
   private usdtContractAddress: string;
-  private networkType: 'mainnet' | 'shasta';
 
   constructor(networkType: 'mainnet' | 'shasta' = 'mainnet') {
-    this.networkType = networkType;
-    const apiUrl = networkType === 'mainnet'
+    this.apiUrl = networkType === 'mainnet'
       ? 'https://api.tronstack.io'
       : 'https://api.shasta.trongrid.io';
-
-    this.tronWeb = new TronWeb({
-      fullHost: apiUrl,
-    });
 
     this.usdtContractAddress = networkType === 'mainnet'
       ? USDT_CONFIG.tron.mainnet
       : USDT_CONFIG.tron.shasta;
+  }
+
+  private getTronWeb() {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    return window.tronWeb ?? null;
   }
 
   /**
@@ -249,7 +249,12 @@ export class TronUSDTService {
    */
   async getUSDTBalance(walletAddress: string): Promise<number> {
     try {
-      const contract = await this.tronWeb.contract(this.getUSDTABI(), this.usdtContractAddress);
+      const tronWeb = this.getTronWeb();
+      if (!tronWeb) {
+        return 0;
+      }
+
+      const contract = await tronWeb.contract(this.getUSDTABI(), this.usdtContractAddress);
       const balance = await contract.balanceOf(walletAddress).call();
       return balance.toNumber() / Math.pow(10, USDT_CONFIG.tron.decimals);
     } catch (error) {
@@ -268,10 +273,15 @@ export class TronUSDTService {
     privateKey: string
   ): Promise<TransactionResult> {
     try {
-      const contract = await this.tronWeb.contract(this.getUSDTABI(), this.usdtContractAddress);
+      const tronWeb = this.getTronWeb();
+      if (!tronWeb) {
+        throw new Error('TronLink wallet not detected. Please install and connect TronLink.');
+      }
+
+      const contract = await tronWeb.contract(this.getUSDTABI(), this.usdtContractAddress);
       
       // Set the sender
-      this.tronWeb.setPrivateKey(privateKey);
+      tronWeb.setPrivateKey(privateKey);
 
       const amountInSmallestUnit = Math.floor(amount * Math.pow(10, USDT_CONFIG.tron.decimals));
 
@@ -284,7 +294,7 @@ export class TronUSDTService {
         });
 
       // Get transaction info
-      const txInfo = await this.tronWeb.trx.getTransaction(tx);
+      const txInfo = await tronWeb.trx.getTransaction(tx);
 
       return {
         success: true,
@@ -367,7 +377,21 @@ export class TronUSDTService {
    */
   async getTransactionStatus(txHash: string): Promise<string> {
     try {
-      const txInfo = await this.tronWeb.trx.getTransaction(txHash);
+      const tronWeb = this.getTronWeb();
+      if (tronWeb) {
+        const txInfo = await tronWeb.trx.getTransaction(txHash);
+        if (txInfo.ret && txInfo.ret[0].contractRet === 'Success') {
+          return 'confirmed';
+        }
+        return 'pending';
+      }
+
+      const response = await fetch(`${this.apiUrl}/wallet/gettransactionbyid`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: txHash }),
+      });
+      const txInfo = await response.json();
       if (txInfo.ret && txInfo.ret[0].contractRet === 'Success') {
         return 'confirmed';
       }
@@ -376,6 +400,18 @@ export class TronUSDTService {
       console.error('Error checking TRON transaction status:', error);
       return 'unknown';
     }
+  }
+}
+
+declare global {
+  interface Window {
+    tronWeb?: {
+      contract: (abi?: unknown, address?: string) => Promise<any> | any;
+      setPrivateKey: (privateKey: string) => void;
+      trx: {
+        getTransaction: (hash: string) => Promise<any>;
+      };
+    };
   }
 }
 

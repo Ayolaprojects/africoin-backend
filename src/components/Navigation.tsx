@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import '../styles/Navigation.css';
 
-const Navigation: React.FC = () => {
+interface NavigationProps {
+  preloadRoute?: (path: string) => void;
+}
+
+const Navigation: React.FC<NavigationProps> = ({ preloadRoute }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const {} = useWallet();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -45,8 +46,12 @@ const Navigation: React.FC = () => {
             <a
               key={item.path}
               href={item.path}
+              onMouseEnter={() => preloadRoute?.(item.path)}
+              onFocus={() => preloadRoute?.(item.path)}
+              onTouchStart={() => preloadRoute?.(item.path)}
               onClick={(e) => {
                 e.preventDefault();
+                preloadRoute?.(item.path);
                 navigate(item.path);
                 setIsOpen(false);
               }}
@@ -57,9 +62,17 @@ const Navigation: React.FC = () => {
         </nav>
 
         <div className="nav-cta">
-          {/* Custom wallet button - cleaner design */}
           <div className="wallet-connect">
-            <WalletMultiButton />
+            <button
+              type="button"
+              onClick={() => {
+                preloadRoute?.('/dashboard');
+                navigate('/dashboard');
+                setIsOpen(false);
+              }}
+            >
+              Open Wallet
+            </button>
           </div>
         </div>
       </div>

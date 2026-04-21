@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+// import { useAuth } from '../context/AuthContext';
 import { statementService, AccountStatement } from '../services/statementService';
-import { balanceService } from '../services/balanceService';
 import './StatementsPage.css';
 
 interface GeneratedStatement {
@@ -13,8 +12,39 @@ interface GeneratedStatement {
   totalOutbound: number;
 }
 
+interface StatementUser {
+  id: string;
+  email: string;
+}
+
+function getStatementUser(): StatementUser | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const candidates = ['user', 'africoin-user', 'auth-user'];
+
+  for (const key of candidates) {
+    const rawValue = window.localStorage.getItem(key);
+    if (!rawValue) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(rawValue) as Partial<StatementUser>;
+      if (typeof parsed.id === 'string' && typeof parsed.email === 'string') {
+        return { id: parsed.id, email: parsed.email };
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
 const StatementsPage: React.FC = () => {
-  const { user } = useAuth();
+  const [user] = useState<StatementUser | null>(() => getStatementUser());
   const [activeTab, setActiveTab] = useState<'generate' | 'history'>('generate');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -80,7 +110,12 @@ const StatementsPage: React.FC = () => {
 
   const handleGenerateStatement = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!user) {
+      setError('Sign in to generate statements');
+      return;
+    }
+
     if (!validateForm()) return;
 
     setLoading(true);
@@ -120,6 +155,11 @@ const StatementsPage: React.FC = () => {
   };
 
   const handleEmailStatement = async (statement: AccountStatement) => {
+    if (!user) {
+      setError('Sign in to email statements');
+      return;
+    }
+
     try {
       setLoading(true);
       await statementService.emailStatement(user!.id, user!.email, statement);
@@ -133,6 +173,11 @@ const StatementsPage: React.FC = () => {
   };
 
   const handleScheduleStatement = async (frequency: 'weekly' | 'monthly' | 'quarterly') => {
+    if (!user) {
+      setError('Sign in to schedule statements');
+      return;
+    }
+
     try {
       setLoading(true);
       await statementService.scheduleStatement(user!.id, frequency);
@@ -154,6 +199,13 @@ const StatementsPage: React.FC = () => {
             <p>Generate, download, and manage your account statements</p>
           </div>
         </div>
+
+        {!user && (
+          <div className="alert alert-error">
+            <i className="fas fa-user-lock"></i>
+            Sign in to generate or email statements.
+          </div>
+        )}
 
         {error && (
           <div className="alert alert-error">
@@ -276,7 +328,7 @@ const StatementsPage: React.FC = () => {
               <button
                 type="submit"
                 className="btn-primary"
-                disabled={loading}
+                disabled={loading || !user}
               >
                 {loading ? (
                   <>
@@ -299,26 +351,26 @@ const StatementsPage: React.FC = () => {
                 <button
                   className="action-btn"
                   onClick={() => handleScheduleStatement('weekly')}
-                  disabled={loading}
+                  disabled={loading || !user}
                 >
                   📧 Weekly Statement
                 </button>
                 <button
                   className="action-btn"
                   onClick={() => handleScheduleStatement('monthly')}
-                  disabled={loading}
+                  disabled={loading || !user}
                 >
                   📧 Monthly Statement
                 </button>
                 <button
                   className="action-btn"
                   onClick={() => handleScheduleStatement('quarterly')}
-                  disabled={loading}
+                  disabled={loading || !user}
                 >
                   📧 Quarterly Statement
                 </button>
               </div>
-              <p className="helper-text">Statements will be automatically emailed to {user?.email}</p>
+              <p className="helper-text">Statements will be automatically emailed to {user?.email ?? 'your account email'}</p>
             </div>
 
             {/* Statement Preview */}

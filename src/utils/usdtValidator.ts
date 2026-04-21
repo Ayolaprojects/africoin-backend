@@ -266,6 +266,8 @@ export class TransactionMonitor {
    * Check transaction status
    */
   private async checkTransactionStatus(txHash: string, blockchain: string): Promise<string> {
+    void txHash;
+    void blockchain;
     // This would be implemented to check actual blockchain status
     // Placeholder implementation
     return 'pending';

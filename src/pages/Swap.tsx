@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Button from '../components/Button';
 import { unifiedUSDT, solanaUSDT } from '../services/usdtService';
 import { USDTValidator } from '../utils/usdtValidator';
@@ -201,6 +202,11 @@ const Swap: React.FC = () => {
         <div className="swap-header">
           <h1>Swap Tokens</h1>
           <p>Exchange your tokens at real-time market rates</p>
+          {!publicKey && (
+            <div style={{ marginTop: '1rem', display: 'inline-flex' }}>
+              <WalletMultiButton />
+            </div>
+          )}
         </div>
 
         {/* Status Messages */}

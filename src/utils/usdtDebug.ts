@@ -4,7 +4,7 @@
  */
 
 import { validateUSDTConfig, isRealTransactionMode, USDT_CONFIG, NETWORKS } from '../config/usdtConfig';
-import { isValidTronAddress } from './usdtTransactionService';
+import { isValidTronAddress } from '../services/usdtTransactionService';
 
 // ============ VALIDATION RESULTS ============
 export interface ValidationResult {
