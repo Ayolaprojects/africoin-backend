@@ -34,7 +34,7 @@ const config: CapacitorConfig = {
       spinnerColor: '#22c55e',
     },
     LocalNotifications: {
-      smallIcon: 'ic_stat_icon_config_sample',
+      smallIcon: 'ic_stat_africoin',
       iconColor: '#22c55e',
     },
   },

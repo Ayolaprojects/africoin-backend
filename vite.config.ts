@@ -31,40 +31,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (!id.includes('node_modules')) {
-            return undefined
-          }
-
-          if (
-            id.includes('@solana/') ||
-            id.includes('@wallet-standard/') ||
-            id.includes('rpc-websockets') ||
-            id.includes('bs58') ||
-            id.includes('bn.js')
-          ) {
-            return 'solana-vendor'
-          }
-
-          if (
-            id.includes('react/') ||
-            id.includes('react-dom/') ||
-            id.includes('scheduler/')
-          ) {
-            return 'react-vendor'
-          }
-
-          if (id.includes('react-router') || id.includes('@remix-run/')) {
-            return 'router-vendor'
-          }
-
-          return 'vendor'
-        }
-      }
-    }
+    sourcemap: false
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
